@@ -1,32 +1,29 @@
 package pl.edu.kasprazak.grazestoperem;
 
 import android.app.Activity;
-import android.os.Handler;
-//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-//import android.support.v7.widget.LinearLayoutManager;
-//import android.support.v7.widget.RecyclerView;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import static java.lang.Integer.min;
 
+//import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.widget.LinearLayoutManager;
+//import android.support.v7.widget.RecyclerView;
+
 public class MainActivity extends Activity {
 
+    // lista pol klasy - zmiennych, ktore sa widoczne w kazdej metodzie klasy
     boolean runningClock = false;
     int counter = 50;
-
     private Runnable worker;
     private Button action;
     private TextView clock;
@@ -34,16 +31,19 @@ public class MainActivity extends Activity {
     private ArrayList<Integer> bestTriesIntArray;
     private LinearLayout lastTriesListView;
     private LinearLayout bestTriesListView;
+    private Integer maxNumberOfItemsOnList = 10;
 
+    // onCreate wykonuje sie raz, kirdy appka startuje, lub jest wznawiana po wyrzuceniu z pamieci urzadzenia
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // inicjalizacja pamieci dla listy Integer'ow
+        bestTriesIntArray = new ArrayList<Integer>();
+        // podstawienie elementow layoutu pod pola klasy, tak, aby mozna je bylo modyfikowac za pomoca kodu javy
         action = (Button) findViewById(R.id.action);
         clock = (TextView) findViewById(R.id.clock);
-
-        bestTriesIntArray = new ArrayList<Integer>();
-
         lastTriesListView = (LinearLayout) findViewById(R.id.lastTriesList);
         bestTriesListView = (LinearLayout) findViewById(R.id.bestTriesList);
 
@@ -61,15 +61,20 @@ public class MainActivity extends Activity {
             }
         };
         handler = new Handler();
+
         action.setOnClickListener(new View.OnClickListener() {
+            // onClock wykonuje sie, kiedy element action (czyli nasz Button) zostaje klikniety (tapniety, na touchscreenie)
             @Override
             public void onClick(View v) {
+                // jezeli zegar, nie chodzi, to ustaw na 50 i startuj, w przeciwnym razie zatrzymaj i aktualizuj listy prob
                 if (!runningClock) {
                     counter = 50;
+                    Log.d("BUTTON", "START" + counter);
                     runningClock = true;
                     handler.postDelayed(worker, 1);
                 } else {
                     runningClock = false;
+                    Log.d("BUTTON", "STOP" + counter);
                     updateLastTriesList(counter);
                     updateBestTriesList(counter);
                 }
@@ -91,10 +96,10 @@ public class MainActivity extends Activity {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT));
 
-
+                Log.d("LAOUT", "dodaję last try" + clockValue);
                 lastTriesListView.addView(newEntry, 0);
 
-                removeTooMuchViewsFromLayout(lastTriesListView, 10);
+                removeTooMuchViewsFromLayout(lastTriesListView, maxNumberOfItemsOnList);
             }
 
             private void updateBestTriesList(Integer clockValue) {
@@ -106,7 +111,7 @@ public class MainActivity extends Activity {
                     }
                 });
 
-                Integer limit = min(bestTriesIntArray.size(), 10);
+                Integer limit = min(bestTriesIntArray.size(), maxNumberOfItemsOnList);
 
                 bestTriesListView.removeAllViews();
 
@@ -117,6 +122,7 @@ public class MainActivity extends Activity {
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
 
+                    Log.d("LAOUT", "dodaję best try" + clockValue);
                     bestTriesListView.addView(pos);
                 }
             }
