@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
         worker = new Runnable() {
             @Override
             public void run() {
-                Log.d("LICZNIK", "DZIAŁAM " + counter);
+                //Log.d("LICZNIK", "DZIAŁAM " + counter);
                 clock.setText("" + counter);
                 --counter;
                 if (runningClock) {
@@ -132,6 +132,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        runningClock = false;
         // Wydaje się, że czegoś tutaj brakuje
         Log.d("CYKL_ZYCIA", "ONPAUSE");
     }
@@ -139,6 +140,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        runningClock = true;
+        handler.postDelayed(worker, 1);
         // Podobnie jak tutaj, też czegoś brakuje
         Log.d("CYKL_ZYCIA", "ONRESUME");
     }
